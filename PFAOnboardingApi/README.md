@@ -30,6 +30,8 @@ dotnet run
 
 Swagger UI: `https://localhost:7080/swagger`
 
+**Test UI:** `http://localhost:5080` (served from `wwwroot/index.html`)
+
 ### Frontend flow
 
 1. User enters mobile → call `GET /api/users/lookup?mobile=...`

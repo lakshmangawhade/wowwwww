@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PFA Onboarding</title>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --primary: #0f6e9e;
+      --primary-dark: #0a5278;
+      --accent: #14b8a6;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #dc2626;
+      --success: #059669;
+      --warning-bg: #fffbeb;
+      --warning-border: #f59e0b;
+      --shadow: 0 10px 40px rgba(15, 110, 158, 0.08);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #e8f4fc 0%, #f0fdfa 50%, #f8fafc 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header .badge {
+      display: inline-block;
+      background: rgba(15, 110, 158, 0.1);
+      color: var(--primary);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 0.35rem;
+    }
+
+    header p { color: var(--muted); font-size: 0.95rem; }
+
+    .api-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow);
+    }
+
+    .api-bar label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .api-bar input {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .card-section {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-section:last-child { border-bottom: none; }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 1rem;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    label .req { color: var(--danger); }
+
+    input, select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15, 110, 158, 0.15);
+    }
+
+    input:read-only {
+      background: #f8fafc;
+      color: var(--muted);
+    }
+
+    .mobile-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .mobile-row input { flex: 1; }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 0.65rem 1.1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .btn-outline:hover:not(:disabled) { background: rgba(15, 110, 158, 0.06); }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-accent:hover:not(:disabled) { background: #0d9488; }
+
+    .alert {
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .alert.show { display: block; }
+
+    .alert-info {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+    }
+
+    .alert-warning {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: #92400e;
+    }
+
+    .alert-success {
+      background: #ecfdf5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+
+    .alert-actions {
+      margin-top: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .distributor-panel {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #fafbfc;
+    }
+
+    .distributor-panel.empty {
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .distributor-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .distributor-item:last-child { border-bottom: none; }
+    .distributor-item:hover { background: #f1f5f9; }
+
+    .distributor-item input[type="checkbox"] {
+      width: 1.1rem;
+      height: 1.1rem;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .distributor-item span { font-size: 0.92rem; }
+
+    .selected-count {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    .form-actions {
+      padding: 1.25rem 1.5rem;
+      background: #f8fafc;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      max-width: 360px;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+      transform: translateY(120%);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 1000;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+
+    .spinner {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field-error {
+      font-size: 0.78rem;
+      color: var(--danger);
+      display: none;
+    }
+
+    .field-error.show { display: block; }
+
+    input.invalid, select.invalid {
+      border-color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="badge">Test UI</div>
+      <h1>PFA Onboarding</h1>
+      <p>Register as a partner — fill your details and select distributors</p>
+    </header>
+
+    <div class="api-bar">
+      <label for="apiBase">API URL</label>
+      <input id="apiBase" type="text" value="" placeholder="http://localhost:5080" />
+      <button type="button" class="btn btn-outline" id="btnReloadTerritories">Reload</button>
+    </div>
+
+    <form id="onboardingForm" novalidate>
+      <div class="card">
+        <!-- Mobile lookup -->
+        <div class="card-section">
+          <div class="section-title">Mobile Verification</div>
+          <div id="lookupAlert" class="alert alert-warning">
+            <strong>Existing profile found</strong>
+            <p id="lookupMessage" style="margin-top:0.35rem"></p>
+            <div class="alert-actions">
+              <button type="button" class="btn btn-accent" id="btnUseExisting">Use existing details</button>
+              <button type="button" class="btn btn-outline" id="btnFillManual">Fill manually</button>
+            </div>
+          </div>
+          <div class="field full">
+            <label for="mobile">Mobile Number <span class="req">*</span></label>
+            <div class="mobile-row">
+              <input id="mobile" type="tel" maxlength="10" placeholder="10-digit mobile" inputmode="numeric" />
+              <button type="button" class="btn btn-primary" id="btnLookup">Verify</button>
+            </div>
+            <span class="field-error" id="err-mobile"></span>
+          </div>
+        </div>
+
+        <!-- Personal details -->
+        <div class="card-section">
+          <div class="section-title">Personal Details</div>
+          <div class="grid">
+            <div class="field full">
+              <label for="name">Full Name <span class="req">*</span></label>
+              <input id="name" type="text" placeholder="Enter full name" />
+              <span class="field-error" id="err-name"></span>
+            </div>
+            <div class="field">
+              <label for="emailId">Email ID <span class="req">*</span></label>
+              <input id="emailId" type="email" placeholder="you@example.com" />
+              <span class="field-error" id="err-emailId"></span>
+            </div>
+            <div class="field">
+              <label for="panNo">PAN No <span class="req">*</span></label>
+              <input id="panNo" type="text" maxlength="10" placeholder="ABCDE1234F" style="text-transform:uppercase" />
+              <span class="field-error" id="err-panNo"></span>
+            </div>
+            <div class="field">
+              <label for="aadhaarNumber">Aadhaar Number <span class="req">*</span></label>
+              <input id="aadhaarNumber" type="text" maxlength="12" placeholder="12 digits" inputmode="numeric" />
+              <span class="field-error" id="err-aadhaarNumber"></span>
+            </div>
+            <div class="field">
+              <label for="uanNumber">UAN Number</label>
+              <input id="uanNumber" type="text" maxlength="12" placeholder="Optional — 12 digits" inputmode="numeric" />
+              <span class="field-error" id="err-uanNumber"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Territory & Distributors -->
+        <div class="card-section">
+          <div class="section-title">Territory &amp; Distributors</div>
+          <div class="grid">
+            <div class="field full">
+              <label for="territoryId">Territory <span class="req">*</span></label>
+              <select id="territoryId">
+                <option value="">— Select territory —</option>
+              </select>
+              <span class="field-error" id="err-territoryId"></span>
+            </div>
+            <div class="field full">
+              <label>Distributors <span class="req">*</span> <small style="font-weight:400;color:var(--muted)">(select one or more)</small></label>
+              <div id="distributorPanel" class="distributor-panel empty">
+                Select a territory to load distributors
+              </div>
+              <span class="field-error" id="err-dealerIds"></span>
+              <div class="selected-count" id="selectedCount"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="reset" class="btn btn-outline" id="btnReset">Clear form</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmit">Submit onboarding</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast" role="alert"></div>
+
+  <script>
+    const state = {
+      useExistingUserDetails: false,
+      userDetailsId: null,
+      distributors: [],
+      existingUser: null,
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function apiBase() {
+      const val = $("apiBase").value.trim();
+      return val || window.location.origin;
+    }
+
+    function showToast(message, type = "success") {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove("show"), 4500);
+    }
+
+    function setFieldError(fieldId, message) {
+      const input = $(fieldId);
+      const err = $("err-" + fieldId);
+      if (message) {
+        input?.classList.add("invalid");
+        if (err) { err.textContent = message; err.classList.add("show"); }
+      } else {
+        input?.classList.remove("invalid");
+        if (err) { err.textContent = ""; err.classList.remove("show"); }
+      }
+    }
+
+    function clearErrors() {
+      ["mobile","name","emailId","panNo","aadhaarNumber","uanNumber","territoryId","dealerIds"]
+        .forEach((f) => setFieldError(f, ""));
+    }
+
+    async function apiGet(path) {
+      const res = await fetch(`${apiBase()}${path}`);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw { status: res.status, data };
+      return data;
+    }
+
+    async function apiPost(path, body) {
+      const res = await fetch(`${apiBase()}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw { status: res.status, data };
+      return data;
+    }
+
+    function showApiErrors(err) {
+      const data = err.data || {};
+      if (data.errors) {
+        Object.entries(data.errors).forEach(([key, msgs]) => {
+          const field = key.charAt(0).toLowerCase() + key.slice(1);
+          setFieldError(field, msgs[0]);
+        });
+      }
+      showToast(data.message || "Something went wrong.", "error");
+    }
+
+    async function loadTerritories() {
+      const select = $("territoryId");
+      select.innerHTML = '<option value="">— Select territory —</option>';
+      try {
+        const territories = await apiGet("/api/territories");
+        territories.forEach((t) => {
+          const opt = document.createElement("option");
+          opt.value = t.territoryId;
+          opt.textContent = t.territoryName;
+          select.appendChild(opt);
+        });
+        showToast(`Loaded ${territories.length} territories`);
+      } catch (e) {
+        showToast("Failed to load territories. Is the API running?", "error");
+      }
+    }
+
+    async function loadDistributors(territoryId) {
+      const panel = $("distributorPanel");
+      state.distributors = [];
+
+      if (!territoryId) {
+        panel.className = "distributor-panel empty";
+        panel.innerHTML = "Select a territory to load distributors";
+        updateSelectedCount();
+        return;
+      }
+
+      panel.className = "distributor-panel empty";
+      panel.innerHTML = "Loading distributors…";
+
+      try {
+        const list = await apiGet(`/api/distributors?territoryId=${territoryId}`);
+        state.distributors = list;
+
+        if (!list.length) {
+          panel.innerHTML = "No distributors found for this territory.";
+          return;
+        }
+
+        panel.className = "distributor-panel";
+        panel.innerHTML = "";
+        list.forEach((d) => {
+          const row = document.createElement("label");
+          row.className = "distributor-item";
+          row.innerHTML = `
+            <input type="checkbox" value="${d.dealerId}" data-name="${escapeHtml(d.retailerShopName)}" />
+            <span>${escapeHtml(d.retailerShopName)}</span>
+          `;
+          panel.appendChild(row);
+        });
+        panel.querySelectorAll("input[type=checkbox]").forEach((cb) => {
+          cb.addEventListener("change", updateSelectedCount);
+        });
+        updateSelectedCount();
+      } catch (e) {
+        panel.className = "distributor-panel empty";
+        panel.innerHTML = "Failed to load distributors.";
+        showToast("Could not load distributors.", "error");
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function getSelectedDealerIds() {
+      return [...document.querySelectorAll("#distributorPanel input[type=checkbox]:checked")]
+        .map((cb) => parseInt(cb.value, 10));
+    }
+
+    function updateSelectedCount() {
+      const count = getSelectedDealerIds().length;
+      $("selectedCount").textContent = count
+        ? `${count} distributor${count > 1 ? "s" : ""} selected`
+        : "";
+      setFieldError("dealerIds", "");
+    }
+
+    function fillFromExisting(user) {
+      $("name").value = user.name || "";
+      $("emailId").value = user.emailId || "";
+      $("panNo").value = (user.panNo || "").toUpperCase();
+      $("aadhaarNumber").value = user.aadhaarNumber || "";
+      $("uanNumber").value = user.uanNumber || "";
+      state.useExistingUserDetails = true;
+      state.userDetailsId = user.userId;
+      $("lookupAlert").classList.remove("show");
+      showToast("Profile details applied.");
+    }
+
+    function resetExistingState() {
+      state.useExistingUserDetails = false;
+      state.userDetailsId = null;
+      state.existingUser = null;
+      $("lookupAlert").classList.remove("show");
+    }
+
+    async function lookupMobile() {
+      const mobile = $("mobile").value.trim();
+      setFieldError("mobile", "");
+      resetExistingState();
+
+      if (!/^[6-9]\d{9}$/.test(mobile)) {
+        setFieldError("mobile", "Enter a valid 10-digit mobile number.");
+        return;
+      }
+
+      const btn = $("btnLookup");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Checking';
+
+      try {
+        const result = await apiGet(`/api/users/lookup?mobile=${encodeURIComponent(mobile)}`);
+        if (result.found && result.userDetails) {
+          state.existingUser = result.userDetails;
+          $("lookupMessage").textContent = result.message || "Use your saved profile?";
+          $("lookupAlert").classList.add("show");
+        } else {
+          showToast(result.message || "No existing profile. Please fill the form.", "success");
+        }
+      } catch (e) {
+        showApiErrors(e);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Verify";
+      }
+    }
+
+    function validateClient() {
+      clearErrors();
+      let ok = true;
+
+      const mobile = $("mobile").value.trim();
+      if (!/^[6-9]\d{9}$/.test(mobile)) {
+        setFieldError("mobile", "Valid 10-digit mobile required.");
+        ok = false;
+      }
+
+      if (!$("name").value.trim()) {
+        setFieldError("name", "Name is required.");
+        ok = false;
+      }
+
+      const email = $("emailId").value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setFieldError("emailId", "Valid email required.");
+        ok = false;
+      }
+
+      const pan = $("panNo").value.trim().toUpperCase();
+      if (!/^[A-Z]{5}\d{4}[A-Z]$/.test(pan)) {
+        setFieldError("panNo", "Valid PAN required (e.g. ABCDE1234F).");
+        ok = false;
+      }
+
+      const aadhaar = $("aadhaarNumber").value.replace(/\D/g, "");
+      if (aadhaar.length !== 12) {
+        setFieldError("aadhaarNumber", "Aadhaar must be 12 digits.");
+        ok = false;
+      }
+
+      const uan = $("uanNumber").value.replace(/\D/g, "");
+      if (uan && uan.length !== 12) {
+        setFieldError("uanNumber", "UAN must be 12 digits or left blank.");
+        ok = false;
+      }
+
+      const territoryId = parseInt($("territoryId").value, 10);
+      if (!territoryId) {
+        setFieldError("territoryId", "Select a territory.");
+        ok = false;
+      }
+
+      const dealerIds = getSelectedDealerIds();
+      if (!dealerIds.length) {
+        setFieldError("dealerIds", "Select at least one distributor.");
+        ok = false;
+      }
+
+      return ok;
+    }
+
+    async function submitForm(e) {
+      e.preventDefault();
+      if (!validateClient()) return;
+
+      const btn = $("btnSubmit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting';
+
+      const payload = {
+        name: $("name").value.trim(),
+        mobile: $("mobile").value.trim(),
+        emailId: $("emailId").value.trim(),
+        panNo: $("panNo").value.trim().toUpperCase(),
+        aadhaarNumber: $("aadhaarNumber").value.replace(/\D/g, ""),
+        uanNumber: $("uanNumber").value.replace(/\D/g, "") || null,
+        territoryId: parseInt($("territoryId").value, 10),
+        dealerIds: getSelectedDealerIds(),
+        useExistingUserDetails: state.useExistingUserDetails,
+        userDetailsId: state.useExistingUserDetails ? state.userDetailsId : null,
+      };
+
+      try {
+        const result = await apiPost("/api/onboarding", payload);
+        showToast(`Submitted! Request #${result.requestId} — ${result.message}`);
+        $("onboardingForm").reset();
+        resetExistingState();
+        loadDistributors(null);
+        await loadTerritories();
+      } catch (err) {
+        showApiErrors(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Submit onboarding";
+      }
+    }
+
+    // Events
+    $("apiBase").value = window.location.origin.includes("file")
+      ? "http://localhost:5080"
+      : window.location.origin;
+
+    $("btnReloadTerritories").addEventListener("click", loadTerritories);
+    $("btnLookup").addEventListener("click", lookupMobile);
+    $("btnUseExisting").addEventListener("click", () => {
+      if (state.existingUser) fillFromExisting(state.existingUser);
+    });
+    $("btnFillManual").addEventListener("click", () => {
+      resetExistingState();
+      showToast("Fill the form with your details.");
+    });
+    $("territoryId").addEventListener("change", (e) => {
+      loadDistributors(e.target.value);
+      setFieldError("dealerIds", "");
+    });
+    $("onboardingForm").addEventListener("submit", submitForm);
+    $("btnReset").addEventListener("click", () => {
+      resetExistingState();
+      loadDistributors(null);
+      clearErrors();
+    });
+
+    // Digits-only helpers
+    ["mobile","aadhaarNumber","uanNumber"].forEach((id) => {
+      $(id).addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/\D/g, "");
+      });
+    });
+
+  loadTerritories();
+  </script>
+</body>
+</html>
