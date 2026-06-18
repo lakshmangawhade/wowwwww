@@ -137,7 +137,6 @@ public class OnboardingService : IOnboardingService
         {
             var existingUserQuery = MobileMatcher.WhereMobileMatches(
                 _db.UserDetails.AsNoTracking(),
-                u => u.Mobile,
                 normalizedMobile);
 
             var existingUser = await existingUserQuery

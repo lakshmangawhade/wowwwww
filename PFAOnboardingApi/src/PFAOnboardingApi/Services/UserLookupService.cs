@@ -27,7 +27,6 @@ public class UserLookupService : IUserLookupService
 
         var userQuery = MobileMatcher.WhereMobileMatches(
             _db.UserDetails.AsNoTracking(),
-            u => u.Mobile,
             normalizedMobile);
 
         var user = await userQuery
