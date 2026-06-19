@@ -8,7 +8,7 @@ public class UserDetails
 {
     public int UserId { get; set; }
     public string Mobile { get; set; } = string.Empty;
-    public string? Name { get; set; }
+    public string? FirstName { get; set; }
     public string? EmailId { get; set; }
     public bool? Active { get; set; }
 }

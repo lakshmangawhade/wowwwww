@@ -19,7 +19,7 @@ public class UserDetailsLookupQuery : IUserDetailsLookupQuery
             .Select(u => new UserDetailsLookupRow
             {
                 UserId = u.UserId,
-                Name = u.Name,
+                Name = u.FirstName,
                 Mobile = u.Mobile,
                 EmailId = u.EmailId
             })
@@ -37,7 +37,7 @@ public class UserDetailsLookupQuery : IUserDetailsLookupQuery
             .Select(u => new UserDetailsLookupRow
             {
                 UserId = u.UserId,
-                Name = u.Name,
+                Name = u.FirstName,
                 Mobile = u.Mobile,
                 EmailId = u.EmailId
             })

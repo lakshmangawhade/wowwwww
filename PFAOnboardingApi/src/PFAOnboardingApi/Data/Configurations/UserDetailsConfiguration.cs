@@ -12,7 +12,7 @@ public class UserDetailsConfiguration : IEntityTypeConfiguration<UserDetails>
         entity.ToTable("UserDetails", DatabaseSchema.Cc);
         entity.HasKey(e => e.UserId);
         entity.Property(e => e.Mobile).HasMaxLength(OnboardingConstants.MobileMaxLength).IsRequired();
-        entity.Property(e => e.Name).HasMaxLength(200);
+        entity.Property(e => e.FirstName).HasColumnName("FirstName").HasMaxLength(200);
         entity.Property(e => e.EmailId).HasMaxLength(256);
         entity.Property(e => e.Active).HasColumnName("Active");
 
