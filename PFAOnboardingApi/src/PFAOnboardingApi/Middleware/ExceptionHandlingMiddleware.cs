@@ -8,11 +8,16 @@ namespace PFAOnboardingApi.Middleware;
 public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly IHostEnvironment _environment;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        IHostEnvironment environment,
+        ILogger<ExceptionHandlingMiddleware> logger)
     {
         _next = next;
+        _environment = environment;
         _logger = logger;
     }
 
@@ -43,10 +48,15 @@ public class ExceptionHandlingMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception.");
+
+            var message = _environment.IsDevelopment()
+                ? ex.Message
+                : "An unexpected error occurred. Please try again later.";
+
             await WriteErrorAsync(
                 context,
                 HttpStatusCode.InternalServerError,
-                new ApiErrorResponse("An unexpected error occurred. Please try again later."));
+                new ApiErrorResponse(message));
         }
     }
 

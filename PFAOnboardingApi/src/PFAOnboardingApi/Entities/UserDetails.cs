@@ -1,8 +1,8 @@
 namespace PFAOnboardingApi.Entities;
 
 /// <summary>
-/// Existing user table — used to pre-fill onboarding when mobile already exists.
-/// Adjust column names to match your actual UserDetails schema if they differ.
+/// Existing cc.UserDetails — lookup by Mobile for onboarding pre-fill.
+/// PAN, Aadhaar, and UAN are collected on the onboarding form only (not stored here).
 /// </summary>
 public class UserDetails
 {
@@ -10,8 +10,5 @@ public class UserDetails
     public string Mobile { get; set; } = string.Empty;
     public string? Name { get; set; }
     public string? EmailId { get; set; }
-    public string? PanNo { get; set; }
-    public string? AadhaarNumber { get; set; }
-    public string? UanNumber { get; set; }
-    public bool? IsActive { get; set; }
+    public bool? Active { get; set; }
 }

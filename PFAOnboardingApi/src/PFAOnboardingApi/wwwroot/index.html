@@ -606,13 +606,13 @@
     function fillFromExisting(user) {
       $("name").value = user.name || "";
       $("emailId").value = user.emailId || "";
-      $("panNo").value = (user.panNo || "").toUpperCase();
-      $("aadhaarNumber").value = user.aadhaarNumber || "";
-      $("uanNumber").value = user.uanNumber || "";
+      $("panNo").value = "";
+      $("aadhaarNumber").value = "";
+      $("uanNumber").value = "";
       state.useExistingUserDetails = true;
       state.userDetailsId = user.userId;
       $("lookupAlert").classList.remove("show");
-      showToast("Profile details applied.");
+      showToast("Name and email applied. Please enter PAN, Aadhaar, and UAN.");
     }
 
     function resetExistingState() {

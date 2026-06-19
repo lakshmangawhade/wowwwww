@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using PFAOnboardingApi.Data;
 using PFAOnboardingApi.DTOs;
+using PFAOnboardingApi.Data.Queries;
 using PFAOnboardingApi.Middleware;
 using PFAOnboardingApi.Services;
 using PFAOnboardingApi.Services.Validation;
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ITerritoryService, TerritoryService>();
 builder.Services.AddScoped<IDistributorService, DistributorService>();
+builder.Services.AddScoped<IUserDetailsLookupQuery, UserDetailsLookupQuery>();
 builder.Services.AddScoped<IUserLookupService, UserLookupService>();
 builder.Services.AddScoped<IOnboardingService, OnboardingService>();
 builder.Services.AddScoped<IOnboardingBusinessValidator, OnboardingBusinessValidator>();

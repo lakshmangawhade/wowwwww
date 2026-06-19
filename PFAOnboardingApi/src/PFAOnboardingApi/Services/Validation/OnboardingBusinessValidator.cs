@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PFAOnboardingApi.Constants;
 using PFAOnboardingApi.Data;
+using PFAOnboardingApi.Data.Queries;
 using PFAOnboardingApi.DTOs;
 using PFAOnboardingApi.Helpers;
 
@@ -9,13 +10,16 @@ namespace PFAOnboardingApi.Services.Validation;
 public class OnboardingBusinessValidator : IOnboardingBusinessValidator
 {
     private readonly ApplicationDbContext _db;
+    private readonly IUserDetailsLookupQuery _userDetailsLookup;
     private readonly ILogger<OnboardingBusinessValidator> _logger;
 
     public OnboardingBusinessValidator(
         ApplicationDbContext db,
+        IUserDetailsLookupQuery userDetailsLookup,
         ILogger<OnboardingBusinessValidator> logger)
     {
         _db = db;
+        _userDetailsLookup = userDetailsLookup;
         _logger = logger;
     }
 
@@ -70,12 +74,12 @@ public class OnboardingBusinessValidator : IOnboardingBusinessValidator
     {
         if (request.UseExistingUserDetails)
         {
-            var linkedUser = await _db.UserDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    u => u.UserId == request.UserDetailsId &&
-                         (u.IsActive == null || u.IsActive == true),
-                    cancellationToken);
+            if (!request.UserDetailsId.HasValue)
+                throw new InvalidOperationException("UserDetailsId is required when using existing user details.");
+
+            var linkedUser = await _userDetailsLookup.FindByUserIdAsync(
+                request.UserDetailsId.Value,
+                cancellationToken);
 
             if (linkedUser is null)
                 throw new InvalidOperationException("Linked user details could not be found.");
@@ -88,11 +92,9 @@ public class OnboardingBusinessValidator : IOnboardingBusinessValidator
             return;
         }
 
-        var existingUser = await MobileMatcher
-            .WhereMobileMatches(_db.UserDetails.AsNoTracking(), normalizedMobile)
-            .AnyAsync(u => u.IsActive == null || u.IsActive == true, cancellationToken);
+        var existingUser = await _userDetailsLookup.FindByMobileAsync(normalizedMobile, cancellationToken);
 
-        if (existingUser)
+        if (existingUser is not null)
         {
             _logger.LogInformation(
                 "Onboarding submitted without reusing existing UserDetails for mobile ending {MobileSuffix}.",
