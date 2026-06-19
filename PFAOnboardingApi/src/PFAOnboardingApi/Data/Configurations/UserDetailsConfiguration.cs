@@ -14,7 +14,10 @@ public class UserDetailsConfiguration : IEntityTypeConfiguration<UserDetails>
         entity.Property(e => e.Mobile).HasMaxLength(OnboardingConstants.MobileMaxLength).IsRequired();
         entity.Property(e => e.FirstName).HasColumnName("FirstName").HasMaxLength(200);
         entity.Property(e => e.EmailId).HasMaxLength(256);
-        entity.Property(e => e.Active).HasColumnName("Active");
+        entity.Property(e => e.Active)
+            .HasColumnName("Active")
+            .HasMaxLength(1)
+            .IsUnicode(false);
 
         entity.HasIndex(e => e.Mobile);
     }

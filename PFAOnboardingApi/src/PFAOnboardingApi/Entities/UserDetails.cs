@@ -10,5 +10,7 @@ public class UserDetails
     public string Mobile { get; set; } = string.Empty;
     public string? FirstName { get; set; }
     public string? EmailId { get; set; }
-    public bool? Active { get; set; }
+
+    /// <summary>Y/N flag in database — not a SQL bit column.</summary>
+    public string? Active { get; set; }
 }

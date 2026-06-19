@@ -10,7 +10,7 @@ ASP.NET Core 8 Web API for the PFA onboarding form with SQL Server (`cc` schema)
 | `PFAOnboardingRequestDistributors` | `cc` | `DistributorId` NVARCHAR(30) → `DealerMaster.ContactId` |
 | `TerritoryMaster` | `cc` | `territoryId` PK |
 | `DealerMaster` | `cc` | `ContactId` PK, `CustomerTypeID = 3` for distributors |
-| `UserDetails` | `cc` | `UserId`, `Mobile`, `FirstName`, `EmailId`, `Active` (no PAN/Aadhaar/UAN) |
+| `UserDetails` | `cc` | `UserId`, `Mobile`, `FirstName`, `EmailId`, `Active` (`Y`/`N`, not bit) |
 
 ### API endpoints
 
