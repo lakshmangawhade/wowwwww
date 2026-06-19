@@ -4,6 +4,7 @@ using PFAOnboardingApi.Data;
 using PFAOnboardingApi.DTOs;
 using PFAOnboardingApi.Middleware;
 using PFAOnboardingApi.Services;
+using PFAOnboardingApi.Services.Validation;
 using PFAOnboardingApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,7 @@ builder.Services.AddScoped<ITerritoryService, TerritoryService>();
 builder.Services.AddScoped<IDistributorService, DistributorService>();
 builder.Services.AddScoped<IUserLookupService, UserLookupService>();
 builder.Services.AddScoped<IOnboardingService, OnboardingService>();
+builder.Services.AddScoped<IOnboardingBusinessValidator, OnboardingBusinessValidator>();
 builder.Services.AddScoped<IValidator<SubmitOnboardingRequest>, SubmitOnboardingRequestValidator>();
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()

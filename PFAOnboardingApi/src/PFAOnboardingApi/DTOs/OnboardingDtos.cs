@@ -2,7 +2,7 @@ namespace PFAOnboardingApi.DTOs;
 
 public record TerritoryDto(int TerritoryId, string TerritoryName);
 
-public record DistributorDto(int DealerId, string RetailerShopName);
+public record DistributorDto(string DistributorId, string RetailerShopName);
 
 public record UserLookupResponse(
     bool Found,
@@ -26,13 +26,12 @@ public record SubmitOnboardingRequest(
     string AadhaarNumber,
     string? UanNumber,
     int TerritoryId,
-    IReadOnlyList<int> DealerIds,
+    IReadOnlyList<string> DistributorIds,
     bool UseExistingUserDetails,
     int? UserDetailsId);
 
 public record OnboardingSubmissionResponse(
     long RequestId,
-    string Status,
     string Message,
     int SelectedDistributorCount);
 

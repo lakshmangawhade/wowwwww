@@ -1,16 +1,15 @@
 namespace PFAOnboardingApi.Entities;
 
 /// <summary>
-/// Junction table for multiple distributor selections per onboarding request.
-/// Suggested name: PFAOnboardingRequestDistributors (clear parent-child relationship).
+/// Selected distributor for an onboarding request (cc.PFAOnboardingRequestDistributors).
 /// </summary>
 public class PFAOnboardingRequestDistributor
 {
     public long Id { get; set; }
     public long RequestId { get; set; }
-    public int DealerId { get; set; }
+    public string DistributorId { get; set; } = string.Empty;
     public DateTime CreatedAtUtc { get; set; }
 
     public PFAOnboardingRequest Request { get; set; } = null!;
-    public DealerMaster Dealer { get; set; } = null!;
+    public DealerMaster Distributor { get; set; } = null!;
 }

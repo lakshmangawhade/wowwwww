@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using PFAOnboardingApi.Constants;
 using PFAOnboardingApi.Data;
 using PFAOnboardingApi.DTOs;
 
@@ -6,8 +7,6 @@ namespace PFAOnboardingApi.Services;
 
 public class DistributorService : IDistributorService
 {
-    private const int DistributorCustomerTypeId = 3;
-
     private readonly ApplicationDbContext _db;
 
     public DistributorService(ApplicationDbContext db) => _db = db;
@@ -26,16 +25,14 @@ public class DistributorService : IDistributorService
         if (!territoryExists)
             return Array.Empty<DistributorDto>();
 
-        var query = _db.DealerMaster
+        return await _db.DealerMaster
             .AsNoTracking()
-            .Where(d => d.TerritoryId == territoryId && d.CustomerTypeId == DistributorCustomerTypeId);
-
-        // Filter active dealers only when the column exists and is populated
-        query = query.Where(d => d.IsActive == null || d.IsActive == true);
-
-        return await query
+            .Where(d =>
+                d.TerritoryId == territoryId &&
+                d.CustomerTypeId == OnboardingConstants.DistributorCustomerTypeId &&
+                (d.IsActive == null || d.IsActive == true))
             .OrderBy(d => d.RetailerShopName)
-            .Select(d => new DistributorDto(d.DealerId, d.RetailerShopName))
+            .Select(d => new DistributorDto(d.ContactId, d.RetailerShopName))
             .ToListAsync(cancellationToken);
     }
 }

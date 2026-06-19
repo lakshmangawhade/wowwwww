@@ -438,7 +438,7 @@
               <div id="distributorPanel" class="distributor-panel empty">
                 Select a territory to load distributors
               </div>
-              <span class="field-error" id="err-dealerIds"></span>
+              <span class="field-error" id="err-distributorIds"></span>
               <div class="selected-count" id="selectedCount"></div>
             </div>
           </div>
@@ -489,7 +489,7 @@
     }
 
     function clearErrors() {
-      ["mobile","name","emailId","panNo","aadhaarNumber","uanNumber","territoryId","dealerIds"]
+      ["mobile","name","emailId","panNo","aadhaarNumber","uanNumber","territoryId","distributorIds"]
         .forEach((f) => setFieldError(f, ""));
     }
 
@@ -568,7 +568,7 @@
           const row = document.createElement("label");
           row.className = "distributor-item";
           row.innerHTML = `
-            <input type="checkbox" value="${d.dealerId}" data-name="${escapeHtml(d.retailerShopName)}" />
+            <input type="checkbox" value="${escapeHtml(d.distributorId)}" data-name="${escapeHtml(d.retailerShopName)}" />
             <span>${escapeHtml(d.retailerShopName)}</span>
           `;
           panel.appendChild(row);
@@ -590,17 +590,17 @@
       return div.innerHTML;
     }
 
-    function getSelectedDealerIds() {
+    function getSelectedDistributorIds() {
       return [...document.querySelectorAll("#distributorPanel input[type=checkbox]:checked")]
-        .map((cb) => parseInt(cb.value, 10));
+        .map((cb) => cb.value);
     }
 
     function updateSelectedCount() {
-      const count = getSelectedDealerIds().length;
+      const count = getSelectedDistributorIds().length;
       $("selectedCount").textContent = count
         ? `${count} distributor${count > 1 ? "s" : ""} selected`
         : "";
-      setFieldError("dealerIds", "");
+      setFieldError("distributorIds", "");
     }
 
     function fillFromExisting(user) {
@@ -698,9 +698,9 @@
         ok = false;
       }
 
-      const dealerIds = getSelectedDealerIds();
-      if (!dealerIds.length) {
-        setFieldError("dealerIds", "Select at least one distributor.");
+      const distributorIds = getSelectedDistributorIds();
+      if (!distributorIds.length) {
+        setFieldError("distributorIds", "Select at least one distributor.");
         ok = false;
       }
 
@@ -723,7 +723,7 @@
         aadhaarNumber: $("aadhaarNumber").value.replace(/\D/g, ""),
         uanNumber: $("uanNumber").value.replace(/\D/g, "") || null,
         territoryId: parseInt($("territoryId").value, 10),
-        dealerIds: getSelectedDealerIds(),
+        distributorIds: getSelectedDistributorIds(),
         useExistingUserDetails: state.useExistingUserDetails,
         userDetailsId: state.useExistingUserDetails ? state.userDetailsId : null,
       };
@@ -759,7 +759,7 @@
     });
     $("territoryId").addEventListener("change", (e) => {
       loadDistributors(e.target.value);
-      setFieldError("dealerIds", "");
+      setFieldError("distributorIds", "");
     });
     $("onboardingForm").addEventListener("submit", submitForm);
     $("btnReset").addEventListener("click", () => {

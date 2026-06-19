@@ -1,11 +1,11 @@
 namespace PFAOnboardingApi.Entities;
 
 /// <summary>
-/// Existing master table — distributors (CustomerTypeID = 3) per territory.
+/// Distributor record from cc.DealerMaster (CustomerTypeID = 3).
 /// </summary>
 public class DealerMaster
 {
-    public int DealerId { get; set; }
+    public string ContactId { get; set; } = string.Empty;
     public int TerritoryId { get; set; }
     public int CustomerTypeId { get; set; }
     public string RetailerShopName { get; set; } = string.Empty;

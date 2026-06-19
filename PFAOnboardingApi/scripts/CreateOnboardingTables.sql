@@ -3,7 +3,7 @@
 
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'PFAOnboardingRequests')
 BEGIN
-    CREATE TABLE dbo.PFAOnboardingRequests
+    CREATE TABLE cc.PFAOnboardingRequests
     (
         RequestId              BIGINT IDENTITY(1,1) NOT NULL,
         Name                   NVARCHAR(200)        NOT NULL,
@@ -16,42 +16,41 @@ BEGIN
         UsedExistingUserDetails BIT                 NOT NULL CONSTRAINT DF_PFAOnboardingRequests_UsedExisting DEFAULT (0),
         UserDetailsId          INT                  NULL,
         CreatedAtUtc           DATETIME2(3)         NOT NULL CONSTRAINT DF_PFAOnboardingRequests_CreatedAt DEFAULT (SYSUTCDATETIME()),
-        Status                 NVARCHAR(20)         NOT NULL CONSTRAINT DF_PFAOnboardingRequests_Status DEFAULT ('Pending'),
 
         CONSTRAINT PK_PFAOnboardingRequests PRIMARY KEY CLUSTERED (RequestId),
         CONSTRAINT FK_PFAOnboardingRequests_Territory
-            FOREIGN KEY (TerritoryId) REFERENCES dbo.TerritoryMaster (TerritoryId),
+            FOREIGN KEY (TerritoryId) REFERENCES cc.TerritoryMaster (territoryId),
         CONSTRAINT FK_PFAOnboardingRequests_UserDetails
-            FOREIGN KEY (UserDetailsId) REFERENCES dbo.UserDetails (UserId)
+            FOREIGN KEY (UserDetailsId) REFERENCES cc.UserDetails (UserId)
     );
 
     CREATE NONCLUSTERED INDEX IX_PFAOnboardingRequests_Mobile
-        ON dbo.PFAOnboardingRequests (Mobile);
+        ON cc.PFAOnboardingRequests (Mobile);
 
     CREATE NONCLUSTERED INDEX IX_PFAOnboardingRequests_TerritoryId
-        ON dbo.PFAOnboardingRequests (TerritoryId);
+        ON cc.PFAOnboardingRequests (TerritoryId);
 END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'PFAOnboardingRequestDistributors')
 BEGIN
-    CREATE TABLE dbo.PFAOnboardingRequestDistributors
+    CREATE TABLE cc.PFAOnboardingRequestDistributors
     (
         Id            BIGINT IDENTITY(1,1) NOT NULL,
         RequestId     BIGINT               NOT NULL,
-        DealerId      INT                  NOT NULL,
+        DistributorId      NVARCHAR(30)                  NOT NULL,
         CreatedAtUtc  DATETIME2(3)         NOT NULL CONSTRAINT DF_PFAOnboardingRequestDistributors_CreatedAt DEFAULT (SYSUTCDATETIME()),
 
         CONSTRAINT PK_PFAOnboardingRequestDistributors PRIMARY KEY CLUSTERED (Id),
         CONSTRAINT FK_PFAOnboardingRequestDistributors_Request
-            FOREIGN KEY (RequestId) REFERENCES dbo.PFAOnboardingRequests (RequestId) ON DELETE CASCADE,
-        CONSTRAINT FK_PFAOnboardingRequestDistributors_Dealer
-            FOREIGN KEY (DealerId) REFERENCES dbo.DealerMaster (DealerId),
+            FOREIGN KEY (RequestId) REFERENCES cc.PFAOnboardingRequests (RequestId) ON DELETE CASCADE,
+        CONSTRAINT FK_PFAOnboardingRequestDistributors_Distributor
+            FOREIGN KEY (DistributorId) REFERENCES cc.DealerMaster (ContactId),
         CONSTRAINT UQ_PFAOnboardingRequestDistributors_Request_Dealer
-            UNIQUE (RequestId, DealerId)
+            UNIQUE (RequestId, DistributorId)
     );
 
     CREATE NONCLUSTERED INDEX IX_PFAOnboardingRequestDistributors_RequestId
-        ON dbo.PFAOnboardingRequestDistributors (RequestId);
+        ON cc.PFAOnboardingRequestDistributors (RequestId);
 END
 GO

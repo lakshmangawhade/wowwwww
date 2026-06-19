@@ -3,19 +3,23 @@ using PFAOnboardingApi.Data;
 using PFAOnboardingApi.DTOs;
 using PFAOnboardingApi.Entities;
 using PFAOnboardingApi.Helpers;
+using PFAOnboardingApi.Services.Validation;
 
 namespace PFAOnboardingApi.Services;
 
 public class OnboardingService : IOnboardingService
 {
-    private const int DistributorCustomerTypeId = 3;
-
     private readonly ApplicationDbContext _db;
+    private readonly IOnboardingBusinessValidator _businessValidator;
     private readonly ILogger<OnboardingService> _logger;
 
-    public OnboardingService(ApplicationDbContext db, ILogger<OnboardingService> logger)
+    public OnboardingService(
+        ApplicationDbContext db,
+        IOnboardingBusinessValidator businessValidator,
+        ILogger<OnboardingService> logger)
     {
         _db = db;
+        _businessValidator = businessValidator;
         _logger = logger;
     }
 
@@ -28,39 +32,31 @@ public class OnboardingService : IOnboardingService
         var normalizedAadhaar = IndianIdentityValidator.NormalizeAadhaar(request.AadhaarNumber);
         var normalizedUan = IndianIdentityValidator.NormalizeUan(request.UanNumber);
 
-        await ValidateBusinessRulesAsync(
-            request,
-            normalizedMobile,
-            cancellationToken);
+        await _businessValidator.ValidateAsync(request, normalizedMobile, cancellationToken);
 
-        var distinctDealerIds = request.DealerIds.Distinct().ToList();
+        var distributorIds = request.DistributorIds
+            .Select(id => id.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
 
         await using var transaction = await _db.Database.BeginTransactionAsync(cancellationToken);
 
         try
         {
-            var onboardingRequest = new PFAOnboardingRequest
-            {
-                Name = request.Name.Trim(),
-                Mobile = normalizedMobile,
-                EmailId = request.EmailId.Trim(),
-                PanNo = normalizedPan,
-                AadhaarNumber = normalizedAadhaar,
-                UanNumber = normalizedUan,
-                TerritoryId = request.TerritoryId,
-                UsedExistingUserDetails = request.UseExistingUserDetails,
-                UserDetailsId = request.UseExistingUserDetails ? request.UserDetailsId : null,
-                CreatedAtUtc = DateTime.UtcNow,
-                Status = OnboardingStatus.Pending
-            };
+            var onboardingRequest = BuildOnboardingRequest(
+                request,
+                normalizedMobile,
+                normalizedPan,
+                normalizedAadhaar,
+                normalizedUan);
 
             _db.PFAOnboardingRequests.Add(onboardingRequest);
             await _db.SaveChangesAsync(cancellationToken);
 
-            var distributorRows = distinctDealerIds.Select(dealerId => new PFAOnboardingRequestDistributor
+            var distributorRows = distributorIds.Select(distributorId => new PFAOnboardingRequestDistributor
             {
                 RequestId = onboardingRequest.RequestId,
-                DealerId = dealerId,
+                DistributorId = distributorId,
                 CreatedAtUtc = DateTime.UtcNow
             });
 
@@ -70,16 +66,15 @@ public class OnboardingService : IOnboardingService
             await transaction.CommitAsync(cancellationToken);
 
             _logger.LogInformation(
-                "Onboarding request {RequestId} created for territory {TerritoryId} with {DealerCount} distributors.",
+                "Onboarding request {RequestId} created for territory {TerritoryId} with {DistributorCount} distributors.",
                 onboardingRequest.RequestId,
                 onboardingRequest.TerritoryId,
-                distinctDealerIds.Count);
+                distributorIds.Count);
 
             return new OnboardingSubmissionResponse(
                 onboardingRequest.RequestId,
-                onboardingRequest.Status,
                 "Onboarding request submitted successfully.",
-                distinctDealerIds.Count);
+                distributorIds.Count);
         }
         catch
         {
@@ -88,75 +83,25 @@ public class OnboardingService : IOnboardingService
         }
     }
 
-    private async Task ValidateBusinessRulesAsync(
+    private static PFAOnboardingRequest BuildOnboardingRequest(
         SubmitOnboardingRequest request,
         string normalizedMobile,
-        CancellationToken cancellationToken)
+        string normalizedPan,
+        string normalizedAadhaar,
+        string? normalizedUan)
     {
-        var territoryValid = await _db.TerritoryMaster
-            .AsNoTracking()
-            .AnyAsync(t => t.TerritoryId == request.TerritoryId && t.IsActive, cancellationToken);
-
-        if (!territoryValid)
-            throw new InvalidOperationException("Selected territory is invalid or inactive.");
-
-        var distinctDealerIds = request.DealerIds.Distinct().ToList();
-
-        var validDealers = await _db.DealerMaster
-            .AsNoTracking()
-            .Where(d =>
-                d.TerritoryId == request.TerritoryId &&
-                d.CustomerTypeId == DistributorCustomerTypeId &&
-                distinctDealerIds.Contains(d.DealerId) &&
-                (d.IsActive == null || d.IsActive == true))
-            .Select(d => d.DealerId)
-            .ToListAsync(cancellationToken);
-
-        if (validDealers.Count != distinctDealerIds.Count)
-            throw new InvalidOperationException(
-                "One or more selected distributors are invalid for the chosen territory.");
-
-        if (request.UseExistingUserDetails)
+        return new PFAOnboardingRequest
         {
-            var linkedUser = await _db.UserDetails
-                .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    u => u.UserId == request.UserDetailsId &&
-                         (u.IsActive == null || u.IsActive == true),
-                    cancellationToken);
-
-            if (linkedUser is null)
-                throw new InvalidOperationException("Linked user details could not be found.");
-
-            var linkedMobile = IndianIdentityValidator.NormalizeMobile(linkedUser.Mobile);
-            if (!string.Equals(linkedMobile, normalizedMobile, StringComparison.Ordinal))
-                throw new InvalidOperationException(
-                    "Mobile number does not match the selected existing user profile.");
-        }
-        else
-        {
-            var existingUserQuery = MobileMatcher.WhereMobileMatches(
-                _db.UserDetails.AsNoTracking(),
-                normalizedMobile);
-
-            var existingUser = await existingUserQuery
-                .AnyAsync(u => u.IsActive == null || u.IsActive == true, cancellationToken);
-
-            // Informational only — frontend should prompt; we still allow manual entry
-            if (existingUser)
-                _logger.LogInformation(
-                    "Onboarding submitted without reusing existing UserDetails for mobile ending {MobileSuffix}.",
-                    normalizedMobile[^4..]);
-        }
-
-        var duplicatePending = await _db.PFAOnboardingRequests
-            .AsNoTracking()
-            .AnyAsync(
-                r => r.Mobile == normalizedMobile && r.Status == OnboardingStatus.Pending,
-                cancellationToken);
-
-        if (duplicatePending)
-            throw new InvalidOperationException(
-                "A pending onboarding request already exists for this mobile number.");
+            Name = request.Name.Trim(),
+            Mobile = normalizedMobile,
+            EmailId = request.EmailId.Trim(),
+            PanNo = normalizedPan,
+            AadhaarNumber = normalizedAadhaar,
+            UanNumber = normalizedUan,
+            TerritoryId = request.TerritoryId,
+            UsedExistingUserDetails = request.UseExistingUserDetails,
+            UserDetailsId = request.UseExistingUserDetails ? request.UserDetailsId : null,
+            CreatedAtUtc = DateTime.UtcNow
+        };
     }
 }

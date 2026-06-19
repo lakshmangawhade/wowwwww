@@ -1,4 +1,5 @@
 using FluentValidation;
+using PFAOnboardingApi.Constants;
 using PFAOnboardingApi.DTOs;
 using PFAOnboardingApi.Helpers;
 
@@ -40,15 +41,17 @@ public class SubmitOnboardingRequestValidator : AbstractValidator<SubmitOnboardi
         RuleFor(x => x.TerritoryId)
             .GreaterThan(0).WithMessage("Territory is required.");
 
-        RuleFor(x => x.DealerIds)
+        RuleFor(x => x.DistributorIds)
             .NotNull().WithMessage("Select at least one distributor.")
             .Must(ids => ids is { Count: > 0 })
             .WithMessage("Select at least one distributor.")
-            .Must(ids => ids!.Distinct().Count() == ids!.Count)
+            .Must(ids => ids!.Distinct(StringComparer.OrdinalIgnoreCase).Count() == ids!.Count)
             .WithMessage("Duplicate distributors are not allowed.");
 
-        RuleForEach(x => x.DealerIds)
-            .GreaterThan(0).WithMessage("Invalid distributor selected.");
+        RuleForEach(x => x.DistributorIds)
+            .NotEmpty().WithMessage("Invalid distributor selected.")
+            .MaximumLength(OnboardingConstants.DistributorIdMaxLength)
+            .WithMessage($"Distributor identifier cannot exceed {OnboardingConstants.DistributorIdMaxLength} characters.");
 
         RuleFor(x => x.UserDetailsId)
             .NotNull()
